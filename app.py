@@ -54,10 +54,6 @@ for role, msg in st.session_state.chat_history:
     else:
         st.markdown(f"**🤖 {role}:** {msg}")
 
-# Reset submission state for clean re-input
-if "submitted" in st.session_state:
-    del st.session_state["submitted"]
-
 # Handle user message submission
 if user_input and "submitted" not in st.session_state:
     st.session_state.submitted = True
