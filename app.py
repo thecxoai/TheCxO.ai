@@ -1,10 +1,10 @@
 import streamlit as st
 from openai import OpenAI
 
-# Initialize OpenAI client using API key stored in Streamlit Secrets
+# Initialize OpenAI client using the secret key from Streamlit Secrets
 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
-# System prompts for each CxO agent
+# Define system prompts for each C-suite role
 AGENT_PROMPTS = {
     "CTO": "You are an experienced Chief Technology Officer (CTO). Provide technical strategy, stack decisions, and architecture guidance.",
     "CMO": "You are a visionary Chief Marketing Officer (CMO). Give brand, content, and go-to-market advice for startups.",
@@ -16,22 +16,22 @@ AGENT_PROMPTS = {
     "CPO": "You are a product-focused Chief Product Officer (CPO). Guide product vision, feature planning, UX, and prioritization."
 }
 
-# Set up the Streamlit interface
-st.set_page_config(page_title="theCXO.ai – Your AI Board", layout="centered")
+# Set up the Streamlit UI
+st.set_page_config(page_title="theCXO.ai – Your AI Boardroom", layout="centered")
 st.title("💼 theCXO.ai – Your AI Boardroom")
-st.markdown("Select an executive and ask for advice like you're the CEO.")
+st.markdown("Select a C-suite role and ask for tailored startup advice:")
 
-# Role selector
+# Role selector dropdown
 selected_role = st.selectbox("🎩 Choose Your Executive", list(AGENT_PROMPTS.keys()))
 
-# Chat history
+# Store chat history in session
 if "chat_history" not in st.session_state:
     st.session_state.chat_history = []
 
-# Text input
-user_input = st.text_input(f"Ask your {selected_role} a question:")
+# Input field for user message
+user_input = st.text_input(f"💬 Ask your {selected_role} something:")
 
-# Function to generate response
+# Function to query OpenAI for a response
 def get_agent_response(role, query):
     try:
         messages = [
@@ -39,25 +39,10 @@ def get_agent_response(role, query):
             {"role": "user", "content": query}
         ]
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-3.5-turbo",  # or "gpt-4-turbo" if enabled for your account
             messages=messages,
             temperature=0.7
         )
-        return response.choices[0].message.content.strip()
-    except Exception as e:
-        return f"Error: {str(e)}"
+        return response.choices[0].message.content
 
-# Display history
-for role, msg in st.session_state.chat_history:
-    if role == "You":
-        st.markdown(f"**🧑 You:** {msg}")
-    else:
-        st.markdown(f"**🤖 {role}:** {msg}")
-
-# Handle input
-if user_input:
-    st.session_state.chat_history.append(("You", user_input))
-    output = get_agent_response(selected_role, user_input)
-    st.session_state.chat_history.append((selected_role, output))
-    st.experimental_rerun()
 
