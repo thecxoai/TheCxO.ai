@@ -43,6 +43,23 @@ def get_agent_response(role, query):
             messages=messages,
             temperature=0.7
         )
-        return response.choices[0].message.content
+        return response.choices[0].message.content.strip()
+    except Exception as e:
+        return f"Error: {str(e)}"
+
+# Display full conversation history
+for role, msg in st.session_state.chat_history:
+    if role == "You":
+        st.markdown(f"**🧑 You:** {msg}")
+    else:
+        st.markdown(f"**🤖 {role}:** {msg}")
+
+# Handle user message submission
+if user_input is not None and user_input.strip() != "":
+    st.session_state.chat_history.append(("You", user_input))
+    response = get_agent_response(selected_role, user_input)
+    st.session_state.chat_history.append((selected_role, response))
+    st.experimental_rerun()
+
 
 
