@@ -54,12 +54,19 @@ for role, msg in st.session_state.chat_history:
     else:
         st.markdown(f"**🤖 {role}:** {msg}")
 
+# Reset submission state for clean re-input
+if "submitted" in st.session_state:
+    del st.session_state["submitted"]
+
 # Handle user message submission
-if user_input is not None and user_input.strip() != "":
+if user_input and "submitted" not in st.session_state:
+    st.session_state.submitted = True
     st.session_state.chat_history.append(("You", user_input))
     response = get_agent_response(selected_role, user_input)
     st.session_state.chat_history.append((selected_role, response))
-    st.experimental_rerun()
+    st.session_state["input_text"] = ""  # reset for future
+    st.experimental_set_query_params(force=True)
+
 
 
 
